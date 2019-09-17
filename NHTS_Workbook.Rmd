@@ -1,0 +1,190 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+Let's download and load the data
+Create a directory NHTS in the project explorer window
+Execute the code below
+Check your console for an input
+
+```{r}
+library(summarizeNHTS)
+download_nhts_data("2017", exdir="NHTS")
+dataset <- read_data("2017", csv_path="NHTS")
+
+```
+
+On linux, files need to be rename manually since the script doesn't work. The messages can be found in the console upon running the above code.
+
+Appropriate files need to be renamed as follows:
+hhpub -> household
+perpub -> person
+vehpub -> vehicles
+
+Also note the weight-files in the folder. They are used in Estimation. The package handles the calculations.
+
+
+```{r}
+dataset <- read_data("2017", csv_path="NHTS")
+
+```
+
+Now we have the data loaded in the variable dataset
+The variable can be explored in the Environment tab on the right side. Note the 4 tables in dataset$data
+
+Here is a sample query
+You should see a plot if it is sucessfully executed
+
+```{r}
+dataset <- read_data("2017", csv_path="NHTS")
+statistic <- summarize_data(
+    data = dataset,
+    agg = "household_count",
+    by = c("HHSIZE","HHVEHCNT")
+)
+make_chart(statistic)
+```
+
+Let's explore the variable
+
+```{r}
+summary(dataset$data)
+```
+
+Note the 4 tables corresponding to the NHTS data.
++ trip
++ person
++ household
++ vehicle
+
+Accessing Raw Data:
+
+```{r}
+dataset$data$vehicle
+```
+
+```{r}
+# By position
+dataset$data$vehicle[, c(1, 3)]
+
+# By name (single variable)
+dataset$data$vehicle$ANNMILES
+
+# By name
+dataset$data$vehicle[, list(HOUSEID, ANNMILES)]
+```
+
+Selecting Specific Rows
+
+```{r}
+# By row numbers (first 5 rows)
+dataset$data$vehicle[1:5, ]
+
+# By condition
+dataset$data$vehicle[VEHTYPE == "01", ]
+
+# By condition (multiple values)
+dataset$data$vehicle[VEHTYPE %in% c("01","02"), ]
+```
+
+Print MAKE and MODEL of vehicles
+Use NHTS Code book and User guide
+
+```{r}
+
+```
+
+Now let's study summarizeData function
+```{r}
+summarize_data(
+  data = dataset,
+  agg = "household_count"
+  )
+```
+
+Group By:
+
+```{r}
+summarize_data(
+  data = dataset,
+  agg = "household_count",
+  by = "HOMEOWN"
+)
+```
+
+Group by with multiple columns
+
+```{r}
+summarize_data(
+  data = dataset,
+  agg = "household_count",
+  by = c("HH_RACE","HOMEOWN")
+)
+```
+```{r}
+temp <- summarize_data(
+  data = dataset,
+  agg = "household_count",
+  by = c("HH_RACE","HOMEOWN")
+)
+make_table(temp)
+```
+
+Generating Frequencies
+
+```{r}
+# Proportion of persons by WORKER, worker status
+temp <- summarize_data(
+  data = dataset,
+  agg = "person_count",
+  by = "WORKER",
+  prop = TRUE
+)
+make_table(temp)
+```
+
+Numeric Aggregates
+
+```{r}
+temp<-summarize_data(
+  data = dataset,
+  agg = "avg",
+  agg_var = "TRPMILES"
+)
+make_table(temp)
+```
+
+Excercise:
+
+Generate Median TripMiles by Homeownership
+
+```{r}
+
+```
+
+```{r}
+summarize_data(
+  data = dataset,
+  agg = "person_trip_rate",
+  by = "WORKER"
+)
+```
+
+Subsetting Data
+
+```{r}
+#Distribution of Leisure Travel
+summarize_data(
+  data = dataset,
+  agg = "trip_count",
+  by = "TRAVDAY",
+  prop = TRUE,
+  subset = "WHYTRP90 %in% c('07','08','10')"
+)
+```
+
+```{r}
+?summarize_data
+```
