@@ -1,9 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
-
 ## Assignment 1: Working with NHTS
 ##### Total: 100 points.
 
